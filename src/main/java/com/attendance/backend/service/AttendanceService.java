@@ -69,6 +69,9 @@ public class AttendanceService {
         }
 
         LocalDateTime checkInTime = LocalDateTime.now();
+        LocalTime lateReferenceTime = employee.getWorkStartTime() == null
+            ? companySetting.getLateAfterTime()
+            : employee.getWorkStartTime();
         AttendanceRecord savedRecord = attendanceRecordRepository.save(
             new AttendanceRecord(
                 employee,
@@ -76,7 +79,7 @@ public class AttendanceService {
                 checkInTime,
                 request.getLatitude(),
                 request.getLongitude(),
-                isLate(checkInTime.toLocalTime(), companySetting.getLateAfterTime()),
+                isLate(checkInTime.toLocalTime(), lateReferenceTime),
                 AttendanceStatus.CHECKED_IN
             )
         );

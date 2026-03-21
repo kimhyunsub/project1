@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "employees")
@@ -38,15 +39,33 @@ public class Employee extends BaseTimeEntity {
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
+    @Column(name = "work_start_time")
+    private LocalTime workStartTime;
+
+    @Column(name = "work_end_time")
+    private LocalTime workEndTime;
+
     protected Employee() {
     }
 
     public Employee(String employeeCode, String name, String password, EmployeeRole role, Company company) {
+        this(employeeCode, name, password, role, company, null, null);
+    }
+
+    public Employee(String employeeCode,
+                    String name,
+                    String password,
+                    EmployeeRole role,
+                    Company company,
+                    LocalTime workStartTime,
+                    LocalTime workEndTime) {
         this.employeeCode = employeeCode;
         this.name = name;
         this.password = password;
         this.role = role;
         this.company = company;
+        this.workStartTime = workStartTime;
+        this.workEndTime = workEndTime;
     }
 
     public Long getId() {
@@ -71,5 +90,13 @@ public class Employee extends BaseTimeEntity {
 
     public Company getCompany() {
         return company;
+    }
+
+    public LocalTime getWorkStartTime() {
+        return workStartTime;
+    }
+
+    public LocalTime getWorkEndTime() {
+        return workEndTime;
     }
 }

@@ -196,6 +196,42 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod ps
 docker compose -f docker-compose.prod.yml --env-file .env.prod logs app --tail=100
 ```
 
+Windows 미니PC에서 `git pull` 부터 재기동까지 한 번에 하려면 아래 스크립트를 사용할 수 있습니다.
+
+- 배포 스크립트: [scripts/deploy-prod.ps1](/Users/hyeonseobkim/workspace/attendance-app/backend/scripts/deploy-prod.ps1)
+
+실행 예시:
+
+```powershell
+cd C:\attendance-app\backend
+powershell -ExecutionPolicy Bypass -File .\scripts\deploy-prod.ps1
+```
+
+더블클릭 실행용 배치 파일:
+
+- [deploy-prod.bat](/Users/hyeonseobkim/workspace/attendance-app/backend/scripts/deploy-prod.bat)
+
+미니PC에서 `C:\attendance-app\backend\scripts\deploy-prod.bat` 를 더블클릭하면 같은 배포가 실행됩니다.
+
+재기동만 하는 스크립트:
+
+- [restart-prod.ps1](/Users/hyeonseobkim/workspace/attendance-app/backend/scripts/restart-prod.ps1)
+- [restart-prod.bat](/Users/hyeonseobkim/workspace/attendance-app/backend/scripts/restart-prod.bat)
+
+미니PC에서 `C:\attendance-app\backend\scripts\restart-prod.bat` 를 더블클릭하면 GitHub pull 없이 현재 코드 기준으로 재빌드/재기동만 수행합니다.
+
+다른 브랜치를 배포할 때:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\deploy-prod.ps1 -Branch main
+```
+
+이미 최신 코드가 받아져 있다면 pull 없이 재기동만:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\deploy-prod.ps1 -SkipPull
+```
+
 중지:
 
 ```bash
