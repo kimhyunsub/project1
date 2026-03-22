@@ -56,4 +56,9 @@ public class AttendanceController {
     ) {
         return ResponseEntity.ok(attendanceService.getCompanySetting(userDetails.getEmployeeId()));
     }
+
+    @GetMapping("/public/company-setting")
+    public ResponseEntity<CompanySettingResponse> getPublicCompanySetting() {
+        return ResponseEntity.ok(attendanceService.getPublicCompanySetting());
+    }
 }

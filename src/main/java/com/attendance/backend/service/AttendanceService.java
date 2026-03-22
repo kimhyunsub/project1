@@ -6,6 +6,7 @@ import com.attendance.backend.domain.entity.Company;
 import com.attendance.backend.domain.entity.CompanySetting;
 import com.attendance.backend.domain.entity.Employee;
 import com.attendance.backend.domain.repository.AttendanceRecordRepository;
+import com.attendance.backend.domain.repository.CompanyRepository;
 import com.attendance.backend.domain.repository.CompanySettingRepository;
 import com.attendance.backend.domain.repository.EmployeeRepository;
 import com.attendance.backend.dto.attendance.CheckInRequest;
@@ -35,15 +36,18 @@ public class AttendanceService {
 
     private final EmployeeRepository employeeRepository;
     private final AttendanceRecordRepository attendanceRecordRepository;
+    private final CompanyRepository companyRepository;
     private final CompanySettingRepository companySettingRepository;
 
     public AttendanceService(
         EmployeeRepository employeeRepository,
         AttendanceRecordRepository attendanceRecordRepository,
+        CompanyRepository companyRepository,
         CompanySettingRepository companySettingRepository
     ) {
         this.employeeRepository = employeeRepository;
         this.attendanceRecordRepository = attendanceRecordRepository;
+        this.companyRepository = companyRepository;
         this.companySettingRepository = companySettingRepository;
     }
 
@@ -152,6 +156,22 @@ public class AttendanceService {
     public CompanySettingResponse getCompanySetting(Long employeeId) {
         Employee employee = getEmployee(employeeId);
         Company company = employee.getCompany();
+        CompanySetting setting = getCompanySetting(company);
+
+        return new CompanySettingResponse(
+            company.getId(),
+            company.getName(),
+            company.getLatitude(),
+            company.getLongitude(),
+            setting.getAllowedRadiusMeters(),
+            setting.getLateAfterTime(),
+            "회사 설정 조회가 완료되었습니다."
+        );
+    }
+
+    public CompanySettingResponse getPublicCompanySetting() {
+        Company company = companyRepository.findFirstByOrderByIdAsc()
+            .orElseThrow(() -> new ResourceNotFoundException("회사를 찾을 수 없습니다."));
         CompanySetting setting = getCompanySetting(company);
 
         return new CompanySettingResponse(
