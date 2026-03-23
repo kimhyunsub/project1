@@ -45,14 +45,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
             CustomUserDetails userDetails =
                 (CustomUserDetails) customUserDetailsService.loadUserByUsername(jwtTokenProvider.getEmployeeCode(token));
-            String deviceId = jwtTokenProvider.getDeviceId(token);
 
             if (!userDetails.isEnabled()) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            if (!StringUtils.hasText(deviceId) || !deviceId.equals(userDetails.getRegisteredDeviceId())) {
                 filterChain.doFilter(request, response);
                 return;
             }

@@ -131,6 +131,7 @@ public class AdminService {
             setting.getAllowedRadiusMeters(),
             setting.getLateAfterTime(),
             setting.getNoticeMessage(),
+            setting.isEnforceSingleDeviceLogin(),
             "회사 위치가 수정되었습니다."
         );
     }
@@ -152,6 +153,7 @@ public class AdminService {
             setting.getAllowedRadiusMeters(),
             setting.getLateAfterTime(),
             setting.getNoticeMessage(),
+            setting.isEnforceSingleDeviceLogin(),
             "출근 반경이 수정되었습니다."
         );
     }

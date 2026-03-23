@@ -2,6 +2,8 @@ package com.attendance.backend.service;
 
 import com.attendance.backend.domain.entity.Employee;
 import com.attendance.backend.domain.entity.EmployeeRole;
+import com.attendance.backend.domain.entity.CompanySetting;
+import com.attendance.backend.domain.repository.CompanySettingRepository;
 import com.attendance.backend.domain.repository.EmployeeRepository;
 import com.attendance.backend.dto.auth.ChangePasswordRequest;
 import com.attendance.backend.dto.auth.ChangePasswordResponse;
@@ -23,15 +25,18 @@ public class AuthService {
     private static final DateTimeFormatter ISO_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_INSTANT;
 
     private final EmployeeRepository employeeRepository;
+    private final CompanySettingRepository companySettingRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
     public AuthService(
         EmployeeRepository employeeRepository,
+        CompanySettingRepository companySettingRepository,
         PasswordEncoder passwordEncoder,
         JwtTokenProvider jwtTokenProvider
     ) {
         this.employeeRepository = employeeRepository;
+        this.companySettingRepository = companySettingRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
     }
@@ -62,10 +67,15 @@ public class AuthService {
             throw new UnauthorizedException("사번 또는 비밀번호가 올바르지 않습니다.");
         }
 
+        CompanySetting companySetting = companySettingRepository.findByCompany(employee.getCompany())
+            .orElse(null);
         String normalizedDeviceId = request.getDeviceId().trim();
         String normalizedDeviceName = request.getDeviceName() == null ? null : request.getDeviceName().trim();
 
-        if (employee.hasRegisteredDevice() && !employee.isRegisteredDevice(normalizedDeviceId)) {
+        if (companySetting != null
+            && companySetting.isEnforceSingleDeviceLogin()
+            && employee.hasRegisteredDevice()
+            && !employee.isRegisteredDevice(normalizedDeviceId)) {
             throw new UnauthorizedException("이미 다른 단말이 등록되어 있습니다. 관리자에게 단말 초기화를 요청해 주세요.");
         }
 

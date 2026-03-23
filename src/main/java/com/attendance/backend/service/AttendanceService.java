@@ -179,6 +179,7 @@ public class AttendanceService {
             setting.getAllowedRadiusMeters(),
             setting.getLateAfterTime(),
             setting.getNoticeMessage(),
+            setting.isEnforceSingleDeviceLogin(),
             "회사 설정 조회가 완료되었습니다."
         );
     }
@@ -196,6 +197,7 @@ public class AttendanceService {
             setting.getAllowedRadiusMeters(),
             setting.getLateAfterTime(),
             setting.getNoticeMessage(),
+            setting.isEnforceSingleDeviceLogin(),
             "회사 설정 조회가 완료되었습니다."
         );
     }

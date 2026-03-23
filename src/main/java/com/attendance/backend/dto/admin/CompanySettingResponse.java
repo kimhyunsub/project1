@@ -11,6 +11,7 @@ public class CompanySettingResponse {
     private final Integer allowedRadiusMeters;
     private final LocalTime lateAfterTime;
     private final String noticeMessage;
+    private final boolean enforceSingleDeviceLogin;
     private final String message;
 
     public CompanySettingResponse(
@@ -21,6 +22,7 @@ public class CompanySettingResponse {
         Integer allowedRadiusMeters,
         LocalTime lateAfterTime,
         String noticeMessage,
+        boolean enforceSingleDeviceLogin,
         String message
     ) {
         this.companyId = companyId;
@@ -30,6 +32,7 @@ public class CompanySettingResponse {
         this.allowedRadiusMeters = allowedRadiusMeters;
         this.lateAfterTime = lateAfterTime;
         this.noticeMessage = noticeMessage;
+        this.enforceSingleDeviceLogin = enforceSingleDeviceLogin;
         this.message = message;
     }
 
@@ -59,6 +62,10 @@ public class CompanySettingResponse {
 
     public String getNoticeMessage() {
         return noticeMessage;
+    }
+
+    public boolean isEnforceSingleDeviceLogin() {
+        return enforceSingleDeviceLogin;
     }
 
     public String getMessage() {
