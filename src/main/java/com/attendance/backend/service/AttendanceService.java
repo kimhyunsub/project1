@@ -1,6 +1,7 @@
 package com.attendance.backend.service;
 
 import com.attendance.backend.domain.entity.AttendanceRecord;
+import com.attendance.backend.domain.entity.AttendanceActionType;
 import com.attendance.backend.domain.entity.AttendanceStatus;
 import com.attendance.backend.domain.entity.Company;
 import com.attendance.backend.domain.entity.CompanySetting;
@@ -38,98 +39,120 @@ public class AttendanceService {
     private final AttendanceRecordRepository attendanceRecordRepository;
     private final CompanyRepository companyRepository;
     private final CompanySettingRepository companySettingRepository;
+    private final AttendanceActionLogService attendanceActionLogService;
 
     public AttendanceService(
         EmployeeRepository employeeRepository,
         AttendanceRecordRepository attendanceRecordRepository,
         CompanyRepository companyRepository,
-        CompanySettingRepository companySettingRepository
+        CompanySettingRepository companySettingRepository,
+        AttendanceActionLogService attendanceActionLogService
     ) {
         this.employeeRepository = employeeRepository;
         this.attendanceRecordRepository = attendanceRecordRepository;
         this.companyRepository = companyRepository;
         this.companySettingRepository = companySettingRepository;
+        this.attendanceActionLogService = attendanceActionLogService;
     }
 
     @Transactional
     public CheckInResponse checkIn(Long employeeId, CheckInRequest request) {
         Employee employee = getEmployee(employeeId);
         LocalDate today = LocalDate.now();
+        Double distanceMeters = null;
 
-        attendanceRecordRepository.findByEmployeeIdAndAttendanceDate(employeeId, today)
-            .ifPresent(record -> {
-                throw new BusinessException("오늘은 이미 출근 처리되었습니다.");
-            });
+        try {
+            attendanceRecordRepository.findByEmployeeIdAndAttendanceDate(employeeId, today)
+                .ifPresent(record -> {
+                    throw new BusinessException("오늘은 이미 출근 처리되었습니다.");
+                });
 
-        Company company = employee.getCompany();
-        CompanySetting companySetting = getCompanySetting(company);
+            Company company = employee.getCompany();
+            CompanySetting companySetting = getCompanySetting(company);
 
-        double distanceMeters = validateLocationProof(
-            request.getLatitude(),
-            request.getLongitude(),
-            request.getAccuracyMeters(),
-            request.getCapturedAt(),
-            company,
-            companySetting,
-            "출근"
-        );
-
-        LocalDateTime checkInTime = LocalDateTime.now();
-        LocalTime lateReferenceTime = employee.getWorkStartTime() == null
-            ? companySetting.getLateAfterTime()
-            : employee.getWorkStartTime();
-        AttendanceRecord savedRecord = attendanceRecordRepository.save(
-            new AttendanceRecord(
-                employee,
-                today,
-                checkInTime,
+            distanceMeters = validateLocationProof(
                 request.getLatitude(),
                 request.getLongitude(),
-                isLate(checkInTime.toLocalTime(), lateReferenceTime),
-                AttendanceStatus.CHECKED_IN
-            )
-        );
+                request.getAccuracyMeters(),
+                request.getCapturedAt(),
+                company,
+                companySetting,
+                "출근"
+            );
 
-        return new CheckInResponse(
-            savedRecord.getCheckInTime(),
-            savedRecord.isLate(),
-            savedRecord.isLate() ? "지각으로 출근 처리되었습니다." : "정상 출근 처리되었습니다."
-        );
+            LocalDateTime checkInTime = LocalDateTime.now();
+            LocalTime lateReferenceTime = employee.getWorkStartTime() == null
+                ? companySetting.getLateAfterTime()
+                : employee.getWorkStartTime();
+            AttendanceRecord savedRecord = attendanceRecordRepository.save(
+                new AttendanceRecord(
+                    employee,
+                    today,
+                    checkInTime,
+                    request.getLatitude(),
+                    request.getLongitude(),
+                    isLate(checkInTime.toLocalTime(), lateReferenceTime),
+                    AttendanceStatus.CHECKED_IN
+                )
+            );
+
+            String message = savedRecord.isLate() ? "지각으로 출근 처리되었습니다." : "정상 출근 처리되었습니다.";
+            logAction(employee, AttendanceActionType.CHECK_IN, today, request, distanceMeters, true, message);
+
+            return new CheckInResponse(
+                savedRecord.getCheckInTime(),
+                savedRecord.isLate(),
+                message
+            );
+        } catch (RuntimeException exception) {
+            logAction(employee, AttendanceActionType.CHECK_IN, today, request, distanceMeters, false, exception.getMessage());
+            throw exception;
+        }
     }
 
     @Transactional
     public CheckOutResponse checkOut(Long employeeId, CheckOutRequest request) {
         Employee employee = getEmployee(employeeId);
-        AttendanceRecord record = attendanceRecordRepository
-            .findByEmployeeIdAndAttendanceDate(employeeId, LocalDate.now())
-            .orElseThrow(() -> new BusinessException("오늘 출근 기록이 없어 퇴근 처리할 수 없습니다."));
+        LocalDate today = LocalDate.now();
+        Double distanceMeters = null;
 
-        if (record.getCheckOutTime() != null) {
-            throw new BusinessException("이미 퇴근 처리되었습니다.");
+        try {
+            AttendanceRecord record = attendanceRecordRepository
+                .findByEmployeeIdAndAttendanceDate(employeeId, today)
+                .orElseThrow(() -> new BusinessException("오늘 출근 기록이 없어 퇴근 처리할 수 없습니다."));
+
+            if (record.getCheckOutTime() != null) {
+                throw new BusinessException("이미 퇴근 처리되었습니다.");
+            }
+
+            Company company = employee.getCompany();
+            CompanySetting companySetting = getCompanySetting(company);
+            distanceMeters = validateLocationProof(
+                request.getLatitude(),
+                request.getLongitude(),
+                request.getAccuracyMeters(),
+                request.getCapturedAt(),
+                company,
+                companySetting,
+                "퇴근"
+            );
+
+            record.checkOut(LocalDateTime.now(), request.getLatitude(), request.getLongitude());
+            String message = "퇴근이 정상 처리되었습니다.";
+            logAction(employee, AttendanceActionType.CHECK_OUT, today, request, distanceMeters, true, message);
+
+            return new CheckOutResponse(
+                record.getId(),
+                record.getAttendanceDate(),
+                record.getCheckInTime(),
+                record.getCheckOutTime(),
+                record.getStatus(),
+                message
+            );
+        } catch (RuntimeException exception) {
+            logAction(employee, AttendanceActionType.CHECK_OUT, today, request, distanceMeters, false, exception.getMessage());
+            throw exception;
         }
-
-        Company company = employee.getCompany();
-        CompanySetting companySetting = getCompanySetting(company);
-        validateLocationProof(
-            request.getLatitude(),
-            request.getLongitude(),
-            request.getAccuracyMeters(),
-            request.getCapturedAt(),
-            company,
-            companySetting,
-            "퇴근"
-        );
-
-        record.checkOut(LocalDateTime.now(), request.getLatitude(), request.getLongitude());
-
-        return new CheckOutResponse(
-            record.getId(),
-            record.getAttendanceDate(),
-            record.getCheckInTime(),
-            record.getCheckOutTime(),
-            record.getStatus(),
-            "퇴근이 정상 처리되었습니다."
-        );
     }
 
     public TodayAttendanceStatusResponse getTodayStatus(Long employeeId) {
@@ -239,5 +262,51 @@ public class AttendanceService {
         }
 
         return distanceMeters;
+    }
+
+    private void logAction(
+        Employee employee,
+        AttendanceActionType actionType,
+        LocalDate attendanceDate,
+        CheckInRequest request,
+        Double distanceMeters,
+        boolean success,
+        String message
+    ) {
+        attendanceActionLogService.logAttempt(
+            employee,
+            actionType,
+            attendanceDate,
+            request.getLatitude(),
+            request.getLongitude(),
+            request.getAccuracyMeters(),
+            request.getCapturedAt(),
+            distanceMeters,
+            success,
+            message
+        );
+    }
+
+    private void logAction(
+        Employee employee,
+        AttendanceActionType actionType,
+        LocalDate attendanceDate,
+        CheckOutRequest request,
+        Double distanceMeters,
+        boolean success,
+        String message
+    ) {
+        attendanceActionLogService.logAttempt(
+            employee,
+            actionType,
+            attendanceDate,
+            request.getLatitude(),
+            request.getLongitude(),
+            request.getAccuracyMeters(),
+            request.getCapturedAt(),
+            distanceMeters,
+            success,
+            message
+        );
     }
 }

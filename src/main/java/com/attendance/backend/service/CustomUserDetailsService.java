@@ -21,6 +21,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) {
         Employee employee = employeeRepository.findByEmployeeCode(username)
             .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다."));
+        if (!employee.isActive()) {
+            throw new ResourceNotFoundException("사용이 중지된 계정입니다.");
+        }
         return new CustomUserDetails(employee);
     }
 }

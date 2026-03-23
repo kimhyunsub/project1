@@ -32,6 +32,9 @@ public class Employee extends BaseTimeEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean active = true;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EmployeeRole role;
@@ -98,6 +101,10 @@ public class Employee extends BaseTimeEntity {
         return role;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
     public Company getCompany() {
         return company;
     }
@@ -134,6 +141,10 @@ public class Employee extends BaseTimeEntity {
         this.registeredDeviceId = deviceId;
         this.registeredDeviceName = deviceName;
         this.deviceRegisteredAt = LocalDateTime.now();
+    }
+
+    public void updateActive(boolean active) {
+        this.active = active;
     }
 
     public void resetRegisteredDevice() {

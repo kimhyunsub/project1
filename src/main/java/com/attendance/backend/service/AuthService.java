@@ -40,6 +40,10 @@ public class AuthService {
             throw new UnauthorizedException("사번 또는 비밀번호가 올바르지 않습니다.");
         }
 
+        if (!employee.isActive()) {
+            throw new UnauthorizedException("사용이 중지된 계정입니다. 관리자에게 문의해 주세요.");
+        }
+
         String normalizedDeviceId = request.getDeviceId().trim();
         String normalizedDeviceName = request.getDeviceName() == null ? null : request.getDeviceName().trim();
 

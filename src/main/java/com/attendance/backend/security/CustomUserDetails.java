@@ -14,6 +14,7 @@ public class CustomUserDetails implements UserDetails {
     private final String employeeCode;
     private final String password;
     private final EmployeeRole role;
+    private final boolean active;
     private final String registeredDeviceId;
 
     public CustomUserDetails(Employee employee) {
@@ -21,6 +22,7 @@ public class CustomUserDetails implements UserDetails {
         this.employeeCode = employee.getEmployeeCode();
         this.password = employee.getPassword();
         this.role = employee.getRole();
+        this.active = employee.isActive();
         this.registeredDeviceId = employee.getRegisteredDeviceId();
     }
 
@@ -34,6 +36,11 @@ public class CustomUserDetails implements UserDetails {
 
     public String getRegisteredDeviceId() {
         return registeredDeviceId;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return active;
     }
 
     @Override
