@@ -254,6 +254,18 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod down
 
 - Variable: `AWS_REGION`
 - Variable: `ECR_REPOSITORY`
+
+## GitHub Self-Hosted Runner 배포
+
+미니PC를 self-hosted runner 로 등록하면 GitHub 웹 UI에서 원격 배포를 실행할 수 있습니다.
+
+- workflow: [deploy-self-hosted.yml](/Users/hyeonseobkim/workspace/attendance-app/backend/.github/workflows/deploy-self-hosted.yml)
+- 가이드: [GITHUB_SELF_HOSTED_DEPLOYMENT.md](/Users/hyeonseobkim/workspace/attendance-app/backend/docs/GITHUB_SELF_HOSTED_DEPLOYMENT.md)
+
+기본 동작:
+
+- `deploy`: `C:\attendance-app\backend\scripts\deploy-prod.ps1` 실행
+- `restart`: `C:\attendance-app\backend\scripts\restart-prod.ps1` 실행
 - Secret: `AWS_ROLE_TO_ASSUME`
 
 권장 방식:
