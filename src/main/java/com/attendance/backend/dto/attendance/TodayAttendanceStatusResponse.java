@@ -12,6 +12,7 @@ public class TodayAttendanceStatusResponse {
     private final LocalDateTime checkOutTime;
     private final AttendanceStatus status;
     private final String companyName;
+    private final String workplaceName;
 
     public TodayAttendanceStatusResponse(
         boolean checkedIn,
@@ -19,7 +20,8 @@ public class TodayAttendanceStatusResponse {
         LocalDateTime checkInTime,
         LocalDateTime checkOutTime,
         AttendanceStatus status,
-        String companyName
+        String companyName,
+        String workplaceName
     ) {
         this.checkedIn = checkedIn;
         this.attendanceDate = attendanceDate;
@@ -27,6 +29,7 @@ public class TodayAttendanceStatusResponse {
         this.checkOutTime = checkOutTime;
         this.status = status;
         this.companyName = companyName;
+        this.workplaceName = workplaceName;
     }
 
     public boolean isCheckedIn() {
@@ -51,5 +54,9 @@ public class TodayAttendanceStatusResponse {
 
     public String getCompanyName() {
         return companyName;
+    }
+
+    public String getWorkplaceName() {
+        return workplaceName;
     }
 }

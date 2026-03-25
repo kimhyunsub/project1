@@ -49,6 +49,10 @@ public class Employee extends BaseTimeEntity {
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workplace_id")
+    private Workplace workplace;
+
     @Column(name = "work_start_time")
     private LocalTime workStartTime;
 
@@ -68,7 +72,7 @@ public class Employee extends BaseTimeEntity {
     }
 
     public Employee(String employeeCode, String name, String password, EmployeeRole role, Company company) {
-        this(employeeCode, name, password, role, company, null, null);
+        this(employeeCode, name, password, role, company, null, null, null);
     }
 
     public Employee(String employeeCode,
@@ -78,11 +82,23 @@ public class Employee extends BaseTimeEntity {
                     Company company,
                     LocalTime workStartTime,
                     LocalTime workEndTime) {
+        this(employeeCode, name, password, role, company, null, workStartTime, workEndTime);
+    }
+
+    public Employee(String employeeCode,
+                    String name,
+                    String password,
+                    EmployeeRole role,
+                    Company company,
+                    Workplace workplace,
+                    LocalTime workStartTime,
+                    LocalTime workEndTime) {
         this.employeeCode = employeeCode;
         this.name = name;
         this.password = password;
         this.role = role;
         this.company = company;
+        this.workplace = workplace;
         this.workStartTime = workStartTime;
         this.workEndTime = workEndTime;
     }
@@ -121,6 +137,10 @@ public class Employee extends BaseTimeEntity {
 
     public Company getCompany() {
         return company;
+    }
+
+    public Workplace getWorkplace() {
+        return workplace;
     }
 
     public LocalTime getWorkStartTime() {

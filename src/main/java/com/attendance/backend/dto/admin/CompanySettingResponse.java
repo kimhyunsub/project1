@@ -6,6 +6,8 @@ public class CompanySettingResponse {
 
     private final Long companyId;
     private final String companyName;
+    private final Long workplaceId;
+    private final String workplaceName;
     private final Double latitude;
     private final Double longitude;
     private final Integer allowedRadiusMeters;
@@ -17,6 +19,8 @@ public class CompanySettingResponse {
     public CompanySettingResponse(
         Long companyId,
         String companyName,
+        Long workplaceId,
+        String workplaceName,
         Double latitude,
         Double longitude,
         Integer allowedRadiusMeters,
@@ -27,6 +31,8 @@ public class CompanySettingResponse {
     ) {
         this.companyId = companyId;
         this.companyName = companyName;
+        this.workplaceId = workplaceId;
+        this.workplaceName = workplaceName;
         this.latitude = latitude;
         this.longitude = longitude;
         this.allowedRadiusMeters = allowedRadiusMeters;
@@ -42,6 +48,14 @@ public class CompanySettingResponse {
 
     public String getCompanyName() {
         return companyName;
+    }
+
+    public Long getWorkplaceId() {
+        return workplaceId;
+    }
+
+    public String getWorkplaceName() {
+        return workplaceName;
     }
 
     public Double getLatitude() {

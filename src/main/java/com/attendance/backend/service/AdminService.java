@@ -126,6 +126,8 @@ public class AdminService {
         return new CompanySettingResponse(
             company.getId(),
             company.getName(),
+            null,
+            null,
             company.getLatitude(),
             company.getLongitude(),
             setting.getAllowedRadiusMeters(),
@@ -148,6 +150,8 @@ public class AdminService {
         return new CompanySettingResponse(
             company.getId(),
             company.getName(),
+            null,
+            null,
             company.getLatitude(),
             company.getLongitude(),
             setting.getAllowedRadiusMeters(),

@@ -91,6 +91,7 @@ public class AuthService {
             employee.getEmployeeCode(),
             employee.getName(),
             employee.getCompany().getName(),
+            employee.getWorkplace() == null ? null : employee.getWorkplace().getName(),
             employee.getRole().name(),
             employee.getRole() == EmployeeRole.EMPLOYEE && employee.isPasswordChangeRequired(),
             accessTokenExpiresAt

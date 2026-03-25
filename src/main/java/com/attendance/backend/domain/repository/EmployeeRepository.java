@@ -7,18 +7,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    @EntityGraph(attributePaths = {"company"})
+    @EntityGraph(attributePaths = {"company", "workplace"})
     Optional<Employee> findByEmployeeCode(String employeeCode);
 
-    @EntityGraph(attributePaths = {"company"})
+    @EntityGraph(attributePaths = {"company", "workplace"})
     java.util.List<Employee> findAllByCompanyIdOrderByNameAsc(Long companyId);
 
-    @EntityGraph(attributePaths = {"company"})
+    @EntityGraph(attributePaths = {"company", "workplace"})
     java.util.List<Employee> findAllByCompanyIdAndActiveTrueOrderByNameAsc(Long companyId);
 
-    @EntityGraph(attributePaths = {"company"})
+    @EntityGraph(attributePaths = {"company", "workplace"})
     java.util.List<Employee> findAllByCompanyIdAndDeletedFalseOrderByNameAsc(Long companyId);
 
-    @EntityGraph(attributePaths = {"company"})
+    @EntityGraph(attributePaths = {"company", "workplace"})
     java.util.List<Employee> findAllByCompanyIdAndActiveTrueAndDeletedFalseOrderByNameAsc(Long companyId);
 }

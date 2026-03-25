@@ -6,6 +6,7 @@ import com.attendance.backend.domain.entity.AttendanceStatus;
 import com.attendance.backend.domain.entity.Company;
 import com.attendance.backend.domain.entity.CompanySetting;
 import com.attendance.backend.domain.entity.Employee;
+import com.attendance.backend.domain.entity.Workplace;
 import com.attendance.backend.domain.repository.AttendanceRecordRepository;
 import com.attendance.backend.domain.repository.CompanyRepository;
 import com.attendance.backend.domain.repository.CompanySettingRepository;
@@ -77,7 +78,7 @@ public class AttendanceService {
                 request.getLongitude(),
                 request.getAccuracyMeters(),
                 request.getCapturedAt(),
-                company,
+                employee,
                 companySetting,
                 "출근"
             );
@@ -154,7 +155,8 @@ public class AttendanceService {
                 record.getCheckInTime(),
                 record.getCheckOutTime(),
                 record.getStatus(),
-                employee.getCompany().getName()
+                employee.getCompany().getName(),
+                employee.getWorkplace() == null ? null : employee.getWorkplace().getName()
             ))
             .orElseGet(() -> new TodayAttendanceStatusResponse(
                 false,
@@ -162,7 +164,8 @@ public class AttendanceService {
                 null,
                 null,
                 null,
-                employee.getCompany().getName()
+                employee.getCompany().getName(),
+                employee.getWorkplace() == null ? null : employee.getWorkplace().getName()
             ));
     }
 
@@ -170,13 +173,16 @@ public class AttendanceService {
         Employee employee = getEmployee(employeeId);
         Company company = employee.getCompany();
         CompanySetting setting = getCompanySetting(company);
+        Workplace workplace = employee.getWorkplace();
 
         return new CompanySettingResponse(
             company.getId(),
             company.getName(),
-            company.getLatitude(),
-            company.getLongitude(),
-            setting.getAllowedRadiusMeters(),
+            workplace == null ? null : workplace.getId(),
+            workplace == null ? null : workplace.getName(),
+            workplace == null ? company.getLatitude() : workplace.getLatitude(),
+            workplace == null ? company.getLongitude() : workplace.getLongitude(),
+            workplace == null ? setting.getAllowedRadiusMeters() : workplace.getAllowedRadiusMeters(),
             setting.getLateAfterTime(),
             setting.getNoticeMessage(),
             setting.isEnforceSingleDeviceLogin(),
@@ -192,6 +198,8 @@ public class AttendanceService {
         return new CompanySettingResponse(
             company.getId(),
             company.getName(),
+            null,
+            null,
             company.getLatitude(),
             company.getLongitude(),
             setting.getAllowedRadiusMeters(),
@@ -229,7 +237,7 @@ public class AttendanceService {
         double longitude,
         double accuracyMeters,
         Instant capturedAt,
-        Company company,
+        Employee employee,
         CompanySetting companySetting,
         String actionLabel
     ) {
@@ -249,16 +257,27 @@ public class AttendanceService {
             );
         }
 
+        Company company = employee.getCompany();
+        Workplace workplace = employee.getWorkplace();
+        double targetLatitude = workplace == null ? company.getLatitude() : workplace.getLatitude();
+        double targetLongitude = workplace == null ? company.getLongitude() : workplace.getLongitude();
+        int allowedRadiusMeters = companySetting.getAllowedRadiusMeters();
+        String locationLabel = workplace == null ? "회사" : workplace.getName();
+
+        if (workplace != null) {
+            allowedRadiusMeters = workplace.getAllowedRadiusMeters();
+        }
+
         double distanceMeters = DistanceCalculator.calculateMeters(
-            company.getLatitude(),
-            company.getLongitude(),
+            targetLatitude,
+            targetLongitude,
             latitude,
             longitude
         );
 
-        if (distanceMeters > companySetting.getAllowedRadiusMeters()) {
+        if (distanceMeters > allowedRadiusMeters) {
             throw new BusinessException(
-                "회사 반경 " + companySetting.getAllowedRadiusMeters() + "m 이내에서만 " + actionLabel
+                locationLabel + " 반경 " + allowedRadiusMeters + "m 이내에서만 " + actionLabel
                     + "할 수 있습니다. 현재 거리: " + Math.round(distanceMeters) + "m"
             );
         }
