@@ -184,7 +184,9 @@ public class AttendanceService {
             workplace == null ? company.getLongitude() : workplace.getLongitude(),
             workplace == null ? setting.getAllowedRadiusMeters() : workplace.getAllowedRadiusMeters(),
             setting.getLateAfterTime(),
-            setting.getNoticeMessage(),
+            workplace == null || workplace.getNoticeMessage() == null || workplace.getNoticeMessage().isBlank()
+                ? setting.getNoticeMessage()
+                : workplace.getNoticeMessage(),
             setting.isEnforceSingleDeviceLogin(),
             "회사 설정 조회가 완료되었습니다."
         );
