@@ -25,3 +25,11 @@ jwt:
 logging:
   level:
     org.hibernate.SQL: debug
+
+invite:
+  base-url: ${INVITE_BASE_URL:https://m.hsft.io.kr}
+  expiration-hours: ${INVITE_EXPIRATION_HOURS:72}
+
+internal:
+  api:
+    key: ${INTERNAL_API_KEY:local-admin-web-key}

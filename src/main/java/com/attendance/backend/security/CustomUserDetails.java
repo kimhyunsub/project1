@@ -12,6 +12,7 @@ public class CustomUserDetails implements UserDetails {
 
     private final Long employeeId;
     private final String employeeCode;
+    private final Long companyId;
     private final String password;
     private final EmployeeRole role;
     private final boolean active;
@@ -21,6 +22,7 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(Employee employee) {
         this.employeeId = employee.getId();
         this.employeeCode = employee.getEmployeeCode();
+        this.companyId = employee.getCompany().getId();
         this.password = employee.getPassword();
         this.role = employee.getRole();
         this.active = employee.isActive();
@@ -34,6 +36,10 @@ public class CustomUserDetails implements UserDetails {
 
     public EmployeeRole getRole() {
         return role;
+    }
+
+    public Long getCompanyId() {
+        return companyId;
     }
 
     public String getRegisteredDeviceId() {

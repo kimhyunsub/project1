@@ -20,3 +20,11 @@ server:
 jwt:
   secret: change-me-change-me-change-me-change-me-very-secret-key
   access-token-expiration-seconds: 86400
+
+invite:
+  base-url: http://localhost:19006
+  expiration-hours: 72
+
+internal:
+  api:
+    key: ${INTERNAL_API_KEY:local-admin-web-key}

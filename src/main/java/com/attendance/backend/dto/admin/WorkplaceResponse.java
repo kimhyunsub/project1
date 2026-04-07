@@ -1,8 +1,6 @@
 package com.attendance.backend.dto.admin;
 
-import java.time.LocalTime;
-
-public class CompanySettingResponse {
+public class WorkplaceResponse {
 
     private final Long companyId;
     private final String companyName;
@@ -11,13 +9,10 @@ public class CompanySettingResponse {
     private final Double latitude;
     private final Double longitude;
     private final Integer allowedRadiusMeters;
-    private final LocalTime lateAfterTime;
     private final String noticeMessage;
-    private final String mobileSkinKey;
-    private final boolean enforceSingleDeviceLogin;
     private final String message;
 
-    public CompanySettingResponse(
+    public WorkplaceResponse(
         Long companyId,
         String companyName,
         Long workplaceId,
@@ -25,10 +20,7 @@ public class CompanySettingResponse {
         Double latitude,
         Double longitude,
         Integer allowedRadiusMeters,
-        LocalTime lateAfterTime,
         String noticeMessage,
-        String mobileSkinKey,
-        boolean enforceSingleDeviceLogin,
         String message
     ) {
         this.companyId = companyId;
@@ -38,10 +30,7 @@ public class CompanySettingResponse {
         this.latitude = latitude;
         this.longitude = longitude;
         this.allowedRadiusMeters = allowedRadiusMeters;
-        this.lateAfterTime = lateAfterTime;
         this.noticeMessage = noticeMessage;
-        this.mobileSkinKey = mobileSkinKey;
-        this.enforceSingleDeviceLogin = enforceSingleDeviceLogin;
         this.message = message;
     }
 
@@ -73,20 +62,8 @@ public class CompanySettingResponse {
         return allowedRadiusMeters;
     }
 
-    public LocalTime getLateAfterTime() {
-        return lateAfterTime;
-    }
-
     public String getNoticeMessage() {
         return noticeMessage;
-    }
-
-    public String getMobileSkinKey() {
-        return mobileSkinKey;
-    }
-
-    public boolean isEnforceSingleDeviceLogin() {
-        return enforceSingleDeviceLogin;
     }
 
     public String getMessage() {

@@ -29,7 +29,7 @@ import org.springframework.security.config.Customizer;
 
 @Configuration
 @EnableMethodSecurity
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties({JwtProperties.class, InviteProperties.class, InternalApiProperties.class})
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -65,7 +65,11 @@ public class SecurityConfig {
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/company-signup").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/invite/activate").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/auth/invite/preview").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/attendance/public/company-setting").permitAll()
+                .requestMatchers("/api/internal/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
             )

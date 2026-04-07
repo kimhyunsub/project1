@@ -21,13 +21,14 @@ public class JwtTokenProvider {
         this.secretKey = Keys.hmacShaKeyFor(resolveSecret(jwtProperties.getSecret()));
     }
 
-    public String generateToken(Long employeeId, String employeeCode, String deviceId) {
+    public String generateToken(Long employeeId, String employeeCode, Long companyId, String deviceId) {
         Instant now = Instant.now();
         Instant expiry = now.plusSeconds(jwtProperties.getAccessTokenExpirationSeconds());
 
         return Jwts.builder()
             .subject(employeeCode)
             .claim("employeeId", employeeId)
+            .claim("companyId", companyId)
             .claim("deviceId", deviceId)
             .issuedAt(Date.from(now))
             .expiration(Date.from(expiry))
@@ -62,6 +63,17 @@ public class JwtTokenProvider {
     public String getDeviceId(String token) {
         Object deviceId = getClaims(token).get("deviceId");
         return deviceId == null ? null : String.valueOf(deviceId);
+    }
+
+    public Long getCompanyId(String token) {
+        Object companyId = getClaims(token).get("companyId");
+        if (companyId instanceof Integer value) {
+            return value.longValue();
+        }
+        if (companyId instanceof Long value) {
+            return value;
+        }
+        return Long.parseLong(String.valueOf(companyId));
     }
 
     public Instant getExpiration(String token) {

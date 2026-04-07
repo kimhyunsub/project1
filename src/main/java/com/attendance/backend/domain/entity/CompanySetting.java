@@ -33,6 +33,9 @@ public class CompanySetting extends BaseTimeEntity {
     @Column(name = "notice_message", length = 1000)
     private String noticeMessage;
 
+    @Column(name = "mobile_skin_key", length = 30)
+    private String mobileSkinKey;
+
     @Column(name = "enforce_single_device_login", nullable = false, columnDefinition = "boolean default true")
     private boolean enforceSingleDeviceLogin = true;
 
@@ -65,6 +68,10 @@ public class CompanySetting extends BaseTimeEntity {
         return noticeMessage;
     }
 
+    public String getMobileSkinKey() {
+        return mobileSkinKey;
+    }
+
     public boolean isEnforceSingleDeviceLogin() {
         return enforceSingleDeviceLogin;
     }
@@ -75,6 +82,10 @@ public class CompanySetting extends BaseTimeEntity {
 
     public void updateNoticeMessage(String noticeMessage) {
         this.noticeMessage = noticeMessage;
+    }
+
+    public void updateMobileSkinKey(String mobileSkinKey) {
+        this.mobileSkinKey = mobileSkinKey;
     }
 
     public void updateEnforceSingleDeviceLogin(boolean enforceSingleDeviceLogin) {

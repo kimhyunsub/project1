@@ -195,6 +195,20 @@ public class Employee extends BaseTimeEntity {
         this.password = password;
     }
 
+    public void updateProfile(String employeeCode,
+                              String name,
+                              EmployeeRole role,
+                              Workplace workplace,
+                              LocalTime workStartTime,
+                              LocalTime workEndTime) {
+        this.employeeCode = employeeCode;
+        this.name = name;
+        this.role = role;
+        this.workplace = workplace;
+        this.workStartTime = workStartTime;
+        this.workEndTime = workEndTime;
+    }
+
     public void markPasswordChangeRequired() {
         this.passwordChangeRequired = true;
     }

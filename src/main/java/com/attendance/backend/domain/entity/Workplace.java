@@ -82,4 +82,18 @@ public class Workplace extends BaseTimeEntity {
     public String getNoticeMessage() {
         return noticeMessage;
     }
+
+    public void update(
+        String name,
+        Double latitude,
+        Double longitude,
+        Integer allowedRadiusMeters,
+        String noticeMessage
+    ) {
+        this.name = name;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.allowedRadiusMeters = allowedRadiusMeters;
+        this.noticeMessage = noticeMessage;
+    }
 }

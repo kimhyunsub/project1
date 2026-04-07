@@ -1,6 +1,7 @@
 package com.attendance.backend.config;
 
 import com.attendance.backend.domain.entity.Company;
+import com.attendance.backend.domain.entity.CompanyPlan;
 import com.attendance.backend.domain.entity.CompanySetting;
 import com.attendance.backend.domain.entity.Employee;
 import com.attendance.backend.domain.entity.EmployeeRole;
@@ -15,6 +16,8 @@ import java.time.LocalTime;
 
 @Configuration
 public class DataInitializer {
+    private static final int DEFAULT_FREE_EMPLOYEE_LIMIT = 7;
+    private static final int DEFAULT_FREE_WORKPLACE_LIMIT = 0;
 
     @Bean
     CommandLineRunner seedData(
@@ -29,7 +32,14 @@ public class DataInitializer {
             }
 
             Company company = companyRepository.save(
-                new Company("OpenAI Seoul Office", 37.5665, 126.9780)
+                new Company(
+                    "OpenAI Seoul Office",
+                    CompanyPlan.FREE,
+                    DEFAULT_FREE_EMPLOYEE_LIMIT,
+                    DEFAULT_FREE_WORKPLACE_LIMIT,
+                    37.5665,
+                    126.9780
+                )
             );
 
             companySettingRepository.save(new CompanySetting(company, 100, LocalTime.of(9, 0)));
