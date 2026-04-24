@@ -73,6 +73,8 @@ public class AttendanceService {
             Company company = employee.getCompany();
             CompanySetting companySetting = getCompanySetting(company);
 
+            validateMockLocation(request.getMockLocation(), "출근");
+
             distanceMeters = validateLocationProof(
                 request.getLatitude(),
                 request.getLongitude(),
@@ -124,6 +126,8 @@ public class AttendanceService {
                 .findByEmployeeIdAndAttendanceDate(employeeId, today)
                 .orElseThrow(() -> new BusinessException("오늘 출근 기록이 없어 퇴근 처리할 수 없습니다."));
             boolean alreadyCheckedOut = record.getCheckOutTime() != null;
+
+            validateMockLocation(request.getMockLocation(), "퇴근");
 
             record.checkOut(currentDateTimeInSeoul(), request.getLatitude(), request.getLongitude());
             String message = alreadyCheckedOut
@@ -234,6 +238,12 @@ public class AttendanceService {
 
     private boolean isLate(LocalTime checkInTime, LocalTime lateAfterTime) {
         return checkInTime.isAfter(lateAfterTime);
+    }
+
+    private void validateMockLocation(Boolean mockLocation, String actionLabel) {
+        if (Boolean.TRUE.equals(mockLocation)) {
+            throw new BusinessException("위치 변조가 감지되어 " + actionLabel + " 처리할 수 없습니다.");
+        }
     }
 
     private double validateLocationProof(

@@ -24,6 +24,8 @@ public class CheckInRequest {
     @NotNull
     private Instant capturedAt;
 
+    private Boolean mockLocation = false;
+
     public Double getLatitude() {
         return latitude;
     }
@@ -54,5 +56,13 @@ public class CheckInRequest {
 
     public void setCapturedAt(Instant capturedAt) {
         this.capturedAt = capturedAt;
+    }
+
+    public Boolean getMockLocation() {
+        return mockLocation;
+    }
+
+    public void setMockLocation(Boolean mockLocation) {
+        this.mockLocation = mockLocation;
     }
 }
