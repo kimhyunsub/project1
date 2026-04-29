@@ -129,4 +129,8 @@ public class AttendanceRecord extends BaseTimeEntity {
     public boolean isLate() {
         return late;
     }
+
+    public void updateLate(boolean late) {
+        this.late = late;
+    }
 }

@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -237,7 +238,8 @@ public class AttendanceService {
     }
 
     private boolean isLate(LocalTime checkInTime, LocalTime lateAfterTime) {
-        return checkInTime.isAfter(lateAfterTime);
+        return checkInTime.truncatedTo(ChronoUnit.MINUTES)
+            .isAfter(lateAfterTime.truncatedTo(ChronoUnit.MINUTES));
     }
 
     private void validateMockLocation(Boolean mockLocation, String actionLabel) {

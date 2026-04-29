@@ -10,6 +10,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AttendanceRecordRepository extends JpaRepository<AttendanceRecord, Long> {
 
     @EntityGraph(attributePaths = {"employee", "employee.company"})
+    List<AttendanceRecord> findAllByLateTrue();
+
+    @EntityGraph(attributePaths = {"employee", "employee.company"})
     Optional<AttendanceRecord> findByEmployeeIdAndAttendanceDate(Long employeeId, LocalDate attendanceDate);
 
     @EntityGraph(attributePaths = {"employee", "employee.company"})
