@@ -93,6 +93,8 @@ public class WorkRequestSchemaInitializer implements ApplicationRunner {
         jdbcTemplate.execute("ALTER TABLE work_requests ADD COLUMN IF NOT EXISTS created_at timestamp(6) NOT NULL DEFAULT now()");
         jdbcTemplate.execute("ALTER TABLE work_requests ADD COLUMN IF NOT EXISTS updated_at timestamp(6) NOT NULL DEFAULT now()");
 
+        ensureWorkRequestStatusConstraint();
+
         jdbcTemplate.execute("""
             CREATE INDEX IF NOT EXISTS idx_work_requests_employee_date
             ON work_requests (employee_id, request_date DESC, created_at DESC)
@@ -106,5 +108,30 @@ public class WorkRequestSchemaInitializer implements ApplicationRunner {
             ON work_requests (reviewed_by_employee_id)
             """);
         log.info("Work request schema is ready.");
+    }
+
+    private void ensureWorkRequestStatusConstraint() {
+        jdbcTemplate.execute("""
+            DO $$
+            DECLARE
+                constraint_name text;
+            BEGIN
+                FOR constraint_name IN
+                    SELECT conname
+                    FROM pg_constraint
+                    WHERE conrelid = 'work_requests'::regclass
+                      AND contype = 'c'
+                      AND pg_get_constraintdef(oid) ILIKE '%status%'
+                LOOP
+                    EXECUTE format('ALTER TABLE work_requests DROP CONSTRAINT IF EXISTS %I', constraint_name);
+                END LOOP;
+            END $$;
+            """);
+
+        jdbcTemplate.execute("""
+            ALTER TABLE work_requests
+            ADD CONSTRAINT work_requests_status_check
+            CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED', 'CANCEL_REQUESTED', 'CANCELED'))
+            """);
     }
 }
