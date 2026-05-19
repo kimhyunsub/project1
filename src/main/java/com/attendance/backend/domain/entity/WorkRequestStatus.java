@@ -4,5 +4,6 @@ public enum WorkRequestStatus {
     PENDING,
     APPROVED,
     REJECTED,
+    CANCEL_REQUESTED,
     CANCELED
 }

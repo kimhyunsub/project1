@@ -50,7 +50,7 @@ public class WorkRequestService {
     private static final Logger log = LoggerFactory.getLogger(WorkRequestService.class);
     private static final ZoneId SEOUL_ZONE_ID = ZoneId.of("Asia/Seoul");
     private static final List<WorkRequestStatus> ACTIVE_DUPLICATE_STATUSES =
-        List.of(WorkRequestStatus.PENDING, WorkRequestStatus.APPROVED);
+        List.of(WorkRequestStatus.PENDING, WorkRequestStatus.APPROVED, WorkRequestStatus.CANCEL_REQUESTED);
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter();
     private static final List<DateTimeFormatter> UPLOAD_DATE_FORMATTERS = List.of(
         DateTimeFormatter.ISO_LOCAL_DATE,
@@ -130,12 +130,16 @@ public class WorkRequestService {
         WorkRequest request = workRequestRepository.findByIdAndEmployeeId(requestId, employeeId)
             .orElseThrow(() -> new ResourceNotFoundException("신청 내역을 찾을 수 없습니다."));
 
-        if (!request.isPending()) {
-            throw new BusinessException("승인 대기 중인 신청만 취소할 수 있습니다.");
+        if (request.isPending()) {
+            request.cancel();
+            return new WorkRequestActionResponse(toResponse(request), "신청이 취소되었습니다.");
+        }
+        if (request.isApproved()) {
+            request.requestCancellation();
+            return new WorkRequestActionResponse(toResponse(request), "취소 요청이 등록되었습니다. 관리자 승인 후 취소됩니다.");
         }
 
-        request.cancel();
-        return new WorkRequestActionResponse(toResponse(request), "신청이 취소되었습니다.");
+        throw new BusinessException("승인 대기 또는 승인된 신청만 취소할 수 있습니다.");
     }
 
     public InternalWorkRequestListResponse getRequestsForAdmin(String adminEmployeeCode) {
@@ -262,8 +266,9 @@ public class WorkRequestService {
         WorkRequest request = getManageableRequest(admin, requestId);
         if (request.getStatus() != WorkRequestStatus.APPROVED
             && request.getStatus() != WorkRequestStatus.PENDING
-            && request.getStatus() != WorkRequestStatus.REJECTED) {
-            throw new BusinessException("승인 대기, 승인 또는 반려된 신청만 취소할 수 있습니다.");
+            && request.getStatus() != WorkRequestStatus.REJECTED
+            && request.getStatus() != WorkRequestStatus.CANCEL_REQUESTED) {
+            throw new BusinessException("승인 대기, 승인, 반려 또는 취소 요청된 신청만 취소할 수 있습니다.");
         }
         request.cancel(admin, normalizeReason(reviewNote));
         return toInternalResponse(request);
@@ -608,7 +613,7 @@ public class WorkRequestService {
             occasionLabel(request.getOccasionType()),
             request.getEarlyLeaveMinutes(),
             request.getReason(),
-            request.getStatus() == WorkRequestStatus.PENDING,
+            request.getStatus() == WorkRequestStatus.PENDING || request.getStatus() == WorkRequestStatus.APPROVED,
             request.getReviewedBy() == null ? null : request.getReviewedBy().getEmployeeCode(),
             request.getReviewedBy() == null ? null : request.getReviewedBy().getName(),
             formatDateTime(request.getReviewedAt()),
@@ -657,6 +662,7 @@ public class WorkRequestService {
             case PENDING -> "승인 대기";
             case APPROVED -> "승인";
             case REJECTED -> "반려";
+            case CANCEL_REQUESTED -> "취소 요청";
             case CANCELED -> "취소";
         };
     }

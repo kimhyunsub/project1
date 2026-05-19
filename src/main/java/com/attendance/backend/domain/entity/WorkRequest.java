@@ -152,6 +152,10 @@ public class WorkRequest extends BaseTimeEntity {
         return status == WorkRequestStatus.PENDING;
     }
 
+    public boolean isApproved() {
+        return status == WorkRequestStatus.APPROVED;
+    }
+
     public void approve(Employee reviewer, String reviewNote) {
         this.status = WorkRequestStatus.APPROVED;
         this.reviewedBy = reviewer;
@@ -171,6 +175,10 @@ public class WorkRequest extends BaseTimeEntity {
     public void cancel() {
         this.status = WorkRequestStatus.CANCELED;
         this.canceledAt = LocalDateTime.now();
+    }
+
+    public void requestCancellation() {
+        this.status = WorkRequestStatus.CANCEL_REQUESTED;
     }
 
     public void cancel(Employee reviewer, String reviewNote) {
