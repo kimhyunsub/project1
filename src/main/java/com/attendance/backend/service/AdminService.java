@@ -647,6 +647,8 @@ public class AdminService {
                     employee.getId(),
                     employee.getEmployeeCode(),
                     employee.getName(),
+                    employee.getEmail(),
+                    employee.getPhoneNumber(),
                     employee.getWorkplace() == null ? "본사" : employee.getWorkplace().getName(),
                     employee.getRole().name(),
                     formatTime(employee.getWorkStartTime()),
@@ -849,6 +851,8 @@ public class AdminService {
             employee.getId(),
             employee.getEmployeeCode(),
             employee.getName(),
+            employee.getEmail(),
+            employee.getPhoneNumber(),
             employee.getRole().name(),
             formatTime(employee.getWorkStartTime()),
             formatTime(employee.getWorkEndTime()),
@@ -880,6 +884,16 @@ public class AdminService {
             parseOptionalTime(request.getWorkStartTime(), "출근 기준 시간"),
             parseOptionalTime(request.getWorkEndTime(), "퇴근 기준 시간")
         );
+        employee.updateProfile(
+            employee.getEmployeeCode(),
+            employee.getName(),
+            employee.getRole(),
+            employee.getWorkplace(),
+            employee.getWorkStartTime(),
+            employee.getWorkEndTime(),
+            normalizeEmail(request.getEmail()),
+            normalizePhoneNumber(request.getPhoneNumber())
+        );
         applyPasswordChangePolicy(employee, role);
         employeeRepository.save(employee);
     }
@@ -904,7 +918,9 @@ public class AdminService {
             role,
             workplace,
             parseOptionalTime(request.getWorkStartTime(), "출근 기준 시간"),
-            parseOptionalTime(request.getWorkEndTime(), "퇴근 기준 시간")
+            parseOptionalTime(request.getWorkEndTime(), "퇴근 기준 시간"),
+            normalizeEmail(request.getEmail()),
+            normalizePhoneNumber(request.getPhoneNumber())
         );
 
         if (StringUtils.hasText(request.getPassword())) {
@@ -1014,9 +1030,11 @@ public class AdminService {
                 String workplaceName = readCell(row, 4);
                 String workStartTime = readCell(row, 5);
                 String workEndTime = readCell(row, 6);
+                String email = readCell(row, 7);
+                String phoneNumber = readCell(row, 8);
 
                 try {
-                    validateUploadRow(rowIndex + 1, employeeCode, name, roleValue, password, workplaceName, workStartTime, workEndTime, existingCodes);
+                    validateUploadRow(rowIndex + 1, employeeCode, name, roleValue, password, workplaceName, workStartTime, workEndTime, email, phoneNumber, existingCodes);
                     validateUploadRole(admin, rowIndex + 1, roleValue);
                     assertCanAddEmployee(admin.getCompany());
                     Workplace workplace = resolveUploadWorkplace(admin, rowIndex + 1, workplaceName, workplacesByName);
@@ -1029,6 +1047,16 @@ public class AdminService {
                         workplace,
                         parseOptionalTime(workStartTime, rowIndex + 1 + "행 출근 기준 시간"),
                         parseOptionalTime(workEndTime, rowIndex + 1 + "행 퇴근 기준 시간")
+                    );
+                    employee.updateProfile(
+                        employee.getEmployeeCode(),
+                        employee.getName(),
+                        employee.getRole(),
+                        employee.getWorkplace(),
+                        employee.getWorkStartTime(),
+                        employee.getWorkEndTime(),
+                        normalizeEmail(email),
+                        normalizePhoneNumber(phoneNumber)
                     );
                     applyPasswordChangePolicy(employee, employee.getRole());
                     employeeRepository.saveAndFlush(employee);
@@ -1474,6 +1502,50 @@ public class AdminService {
         }
     }
 
+    private String normalizeEmail(String email) {
+        if (!StringUtils.hasText(email)) {
+            return null;
+        }
+        String normalized = email.trim();
+        validateEmail(normalized, "이메일");
+        return normalized;
+    }
+
+    private String normalizePhoneNumber(String phoneNumber) {
+        if (!StringUtils.hasText(phoneNumber)) {
+            return null;
+        }
+        String normalized = phoneNumber.trim();
+        validatePhoneNumber(normalized, "휴대폰번호");
+        return normalized;
+    }
+
+    private void validateEmail(String email, String label) {
+        if (!StringUtils.hasText(email)) {
+            return;
+        }
+        String normalized = email.trim();
+        if (normalized.length() > 254) {
+            throw new BusinessException(label + "은 254자 이하여야 합니다.");
+        }
+        if (!normalized.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new BusinessException(label + " 형식이 올바르지 않습니다.");
+        }
+    }
+
+    private void validatePhoneNumber(String phoneNumber, String label) {
+        if (!StringUtils.hasText(phoneNumber)) {
+            return;
+        }
+        String normalized = phoneNumber.trim();
+        if (normalized.length() > 30) {
+            throw new BusinessException(label + "는 30자 이하여야 합니다.");
+        }
+        if (!normalized.matches("^[0-9+()\\-\\s.]+$")) {
+            throw new BusinessException(label + "에는 숫자, 공백, +, -, (, ), . 만 입력할 수 있습니다.");
+        }
+    }
+
     private LocalTime parseOptionalTime(String value, String label) {
         if (!StringUtils.hasText(value)) {
             return null;
@@ -1610,6 +1682,8 @@ public class AdminService {
                                    String workplaceName,
                                    String workStartTime,
                                    String workEndTime,
+                                   String email,
+                                   String phoneNumber,
                                    Set<String> existingCodes) {
         if (!StringUtils.hasText(employeeCode)) {
             throw new BusinessException(rowNumber + "행: 사번을 입력해 주세요.");
@@ -1626,6 +1700,8 @@ public class AdminService {
         if (name.length() > 100) {
             throw new BusinessException(rowNumber + "행: 이름은 100자 이하여야 합니다.");
         }
+        validateEmail(email, rowNumber + "행 이메일");
+        validatePhoneNumber(phoneNumber, rowNumber + "행 휴대폰번호");
         if (!StringUtils.hasText(roleValue)) {
             throw new BusinessException(rowNumber + "행: 권한을 입력해 주세요.");
         }

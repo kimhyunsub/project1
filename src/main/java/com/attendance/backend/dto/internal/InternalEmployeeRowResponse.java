@@ -4,6 +4,8 @@ public record InternalEmployeeRowResponse(
     Long id,
     String employeeCode,
     String name,
+    String email,
+    String phoneNumber,
     String workplaceName,
     String role,
     String workStartTime,

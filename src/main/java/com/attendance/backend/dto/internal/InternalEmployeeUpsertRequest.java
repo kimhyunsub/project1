@@ -4,6 +4,8 @@ public class InternalEmployeeUpsertRequest {
 
     private String employeeCode;
     private String name;
+    private String email;
+    private String phoneNumber;
     private String role;
     private String password;
     private String workStartTime;
@@ -24,6 +26,22 @@ public class InternalEmployeeUpsertRequest {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getRole() {

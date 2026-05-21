@@ -29,6 +29,12 @@ public class Employee extends BaseTimeEntity {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(length = 254)
+    private String email;
+
+    @Column(name = "phone_number", length = 30)
+    private String phoneNumber;
+
     @Column(nullable = false)
     private String password;
 
@@ -113,6 +119,14 @@ public class Employee extends BaseTimeEntity {
 
     public String getName() {
         return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
     public String getPassword() {
@@ -201,12 +215,25 @@ public class Employee extends BaseTimeEntity {
                               Workplace workplace,
                               LocalTime workStartTime,
                               LocalTime workEndTime) {
+        updateProfile(employeeCode, name, role, workplace, workStartTime, workEndTime, email, phoneNumber);
+    }
+
+    public void updateProfile(String employeeCode,
+                              String name,
+                              EmployeeRole role,
+                              Workplace workplace,
+                              LocalTime workStartTime,
+                              LocalTime workEndTime,
+                              String email,
+                              String phoneNumber) {
         this.employeeCode = employeeCode;
         this.name = name;
         this.role = role;
         this.workplace = workplace;
         this.workStartTime = workStartTime;
         this.workEndTime = workEndTime;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
     }
 
     public void markPasswordChangeRequired() {
