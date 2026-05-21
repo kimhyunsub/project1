@@ -475,7 +475,9 @@ public class AdminService {
                 workplace.getLongitude(),
                 workplace.getAllowedRadiusMeters(),
                 workplace.getNoticeMessage(),
-                workplace.isWorkRequestApprovalRequired()
+                workplace.isWorkRequestApprovalRequired(),
+                workplace.isWorkRequestEnabled(),
+                workplace.isEnforceSingleDeviceLogin()
             ))
             .toList();
 
@@ -591,7 +593,9 @@ public class AdminService {
             request.getLongitude(),
             request.getAllowedRadiusMeters(),
             normalizeNoticeMessage(request.getNoticeMessage()),
-            request.isWorkRequestApprovalRequired()
+            request.isWorkRequestApprovalRequired(),
+            request.isWorkRequestEnabled(),
+            request.isEnforceSingleDeviceLogin()
         ));
     }
 
@@ -611,7 +615,9 @@ public class AdminService {
             request.getLongitude(),
             request.getAllowedRadiusMeters(),
             normalizeNoticeMessage(request.getNoticeMessage()),
-            request.isWorkRequestApprovalRequired()
+            request.isWorkRequestApprovalRequired(),
+            request.isWorkRequestEnabled(),
+            request.isEnforceSingleDeviceLogin()
         );
     }
 

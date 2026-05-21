@@ -78,7 +78,7 @@ public class WorkRequestService {
     public WorkRequestCreateResponse createRequest(Long employeeId, CreateWorkRequestRequest request) {
         Employee employee = getEmployee(employeeId);
         CompanySetting setting = getCompanySetting(employee);
-        assertWorkRequestEnabled(setting);
+        assertWorkRequestEnabled(employee, setting);
         WorkRequestType requestType = parseRequestType(request.getRequestType());
         LocalDate requestDate = parseRequestDate(request.getRequestDate());
         HalfDayType halfDayType = parseHalfDayType(requestType, request.getHalfDayType());
@@ -123,7 +123,7 @@ public class WorkRequestService {
         CompanySetting setting = getCompanySetting(employee);
         return new WorkRequestListResponse(
             resolveApprovalRequiredForList(employee, setting),
-            setting.isWorkRequestEnabled(),
+            isWorkRequestEnabled(employee, setting),
             loadRequestResponses(employeeId)
         );
     }
@@ -132,7 +132,7 @@ public class WorkRequestService {
     public WorkRequestActionResponse cancelRequest(Long employeeId, Long requestId) {
         WorkRequest request = workRequestRepository.findByIdAndEmployeeId(requestId, employeeId)
             .orElseThrow(() -> new ResourceNotFoundException("신청 내역을 찾을 수 없습니다."));
-        assertWorkRequestEnabled(getCompanySetting(request.getEmployee()));
+        assertWorkRequestEnabled(request.getEmployee(), getCompanySetting(request.getEmployee()));
 
         if (request.isPending()) {
             request.cancel();
@@ -438,8 +438,14 @@ public class WorkRequestService {
             : employee.getWorkplace().isWorkRequestApprovalRequired();
     }
 
-    private void assertWorkRequestEnabled(CompanySetting setting) {
-        if (!setting.isWorkRequestEnabled()) {
+    private boolean isWorkRequestEnabled(Employee employee, CompanySetting setting) {
+        return employee.getWorkplace() == null
+            ? setting.isWorkRequestEnabled()
+            : employee.getWorkplace().isWorkRequestEnabled();
+    }
+
+    private void assertWorkRequestEnabled(Employee employee, CompanySetting setting) {
+        if (!isWorkRequestEnabled(employee, setting)) {
             throw new BusinessException("휴가신청 기능이 비활성화되어 있습니다.");
         }
     }

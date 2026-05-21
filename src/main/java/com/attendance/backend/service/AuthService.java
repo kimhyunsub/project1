@@ -142,7 +142,7 @@ public class AuthService {
         String normalizedDeviceName = request.getDeviceName() == null ? null : request.getDeviceName().trim();
 
         if (companySetting != null
-            && companySetting.isEnforceSingleDeviceLogin()
+            && isSingleDeviceLoginEnforced(employee, companySetting)
             && employee.hasRegisteredDevice()
             && !employee.isRegisteredDevice(normalizedDeviceId)) {
             throw new UnauthorizedException("이미 다른 단말이 등록되어 있습니다. 관리자에게 단말 초기화를 요청해 주세요.");
@@ -171,6 +171,13 @@ public class AuthService {
             employee.getRole() == EmployeeRole.EMPLOYEE && employee.isPasswordChangeRequired(),
             accessTokenExpiresAt
         );
+    }
+
+    private boolean isSingleDeviceLoginEnforced(Employee employee, CompanySetting companySetting) {
+        if (employee.getWorkplace() != null) {
+            return employee.getWorkplace().isEnforceSingleDeviceLogin();
+        }
+        return companySetting.isEnforceSingleDeviceLogin();
     }
 
     public InvitePreviewResponse previewInvite(String token) {

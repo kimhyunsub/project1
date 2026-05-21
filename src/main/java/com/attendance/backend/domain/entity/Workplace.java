@@ -41,6 +41,12 @@ public class Workplace extends BaseTimeEntity {
     @Column(name = "work_request_approval_required", nullable = false, columnDefinition = "boolean default true")
     private boolean workRequestApprovalRequired = true;
 
+    @Column(name = "work_request_enabled", nullable = false, columnDefinition = "boolean default true")
+    private boolean workRequestEnabled = true;
+
+    @Column(name = "enforce_single_device_login", nullable = false, columnDefinition = "boolean default true")
+    private boolean enforceSingleDeviceLogin = true;
+
     protected Workplace() {
     }
 
@@ -51,6 +57,18 @@ public class Workplace extends BaseTimeEntity {
                      Integer allowedRadiusMeters,
                      String noticeMessage,
                      boolean workRequestApprovalRequired) {
+        this(company, name, latitude, longitude, allowedRadiusMeters, noticeMessage, workRequestApprovalRequired, true, true);
+    }
+
+    public Workplace(Company company,
+                     String name,
+                     Double latitude,
+                     Double longitude,
+                     Integer allowedRadiusMeters,
+                     String noticeMessage,
+                     boolean workRequestApprovalRequired,
+                     boolean workRequestEnabled,
+                     boolean enforceSingleDeviceLogin) {
         this.company = company;
         this.name = name;
         this.latitude = latitude;
@@ -58,6 +76,8 @@ public class Workplace extends BaseTimeEntity {
         this.allowedRadiusMeters = allowedRadiusMeters;
         this.noticeMessage = noticeMessage;
         this.workRequestApprovalRequired = workRequestApprovalRequired;
+        this.workRequestEnabled = workRequestEnabled;
+        this.enforceSingleDeviceLogin = enforceSingleDeviceLogin;
     }
 
     public Long getId() {
@@ -92,13 +112,23 @@ public class Workplace extends BaseTimeEntity {
         return workRequestApprovalRequired;
     }
 
+    public boolean isWorkRequestEnabled() {
+        return workRequestEnabled;
+    }
+
+    public boolean isEnforceSingleDeviceLogin() {
+        return enforceSingleDeviceLogin;
+    }
+
     public void update(
         String name,
         Double latitude,
         Double longitude,
         Integer allowedRadiusMeters,
         String noticeMessage,
-        boolean workRequestApprovalRequired
+        boolean workRequestApprovalRequired,
+        boolean workRequestEnabled,
+        boolean enforceSingleDeviceLogin
     ) {
         this.name = name;
         this.latitude = latitude;
@@ -106,5 +136,7 @@ public class Workplace extends BaseTimeEntity {
         this.allowedRadiusMeters = allowedRadiusMeters;
         this.noticeMessage = noticeMessage;
         this.workRequestApprovalRequired = workRequestApprovalRequired;
+        this.workRequestEnabled = workRequestEnabled;
+        this.enforceSingleDeviceLogin = enforceSingleDeviceLogin;
     }
 }
