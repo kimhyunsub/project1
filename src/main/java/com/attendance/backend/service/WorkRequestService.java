@@ -78,6 +78,7 @@ public class WorkRequestService {
     public WorkRequestCreateResponse createRequest(Long employeeId, CreateWorkRequestRequest request) {
         Employee employee = getEmployee(employeeId);
         CompanySetting setting = getCompanySetting(employee);
+        assertWorkRequestEnabled(setting);
         WorkRequestType requestType = parseRequestType(request.getRequestType());
         LocalDate requestDate = parseRequestDate(request.getRequestDate());
         HalfDayType halfDayType = parseHalfDayType(requestType, request.getHalfDayType());
@@ -119,8 +120,10 @@ public class WorkRequestService {
 
     public WorkRequestListResponse getRequests(Long employeeId) {
         Employee employee = getEmployee(employeeId);
+        CompanySetting setting = getCompanySetting(employee);
         return new WorkRequestListResponse(
-            resolveApprovalRequiredForList(employee),
+            resolveApprovalRequiredForList(employee, setting),
+            setting.isWorkRequestEnabled(),
             loadRequestResponses(employeeId)
         );
     }
@@ -129,6 +132,7 @@ public class WorkRequestService {
     public WorkRequestActionResponse cancelRequest(Long employeeId, Long requestId) {
         WorkRequest request = workRequestRepository.findByIdAndEmployeeId(requestId, employeeId)
             .orElseThrow(() -> new ResourceNotFoundException("신청 내역을 찾을 수 없습니다."));
+        assertWorkRequestEnabled(getCompanySetting(request.getEmployee()));
 
         if (request.isPending()) {
             request.cancel();
@@ -402,9 +406,9 @@ public class WorkRequestService {
             .orElseThrow(() -> new ResourceNotFoundException("회사 설정을 찾을 수 없습니다."));
     }
 
-    private boolean resolveApprovalRequiredForList(Employee employee) {
+    private boolean resolveApprovalRequiredForList(Employee employee, CompanySetting setting) {
         try {
-            return isWorkRequestApprovalRequired(employee, getCompanySetting(employee));
+            return isWorkRequestApprovalRequired(employee, setting);
         } catch (RuntimeException exception) {
             log.warn(
                 "Failed to resolve work request approval setting. employeeId={}",
@@ -432,6 +436,12 @@ public class WorkRequestService {
         return employee.getWorkplace() == null
             ? setting.isWorkRequestApprovalRequired()
             : employee.getWorkplace().isWorkRequestApprovalRequired();
+    }
+
+    private void assertWorkRequestEnabled(CompanySetting setting) {
+        if (!setting.isWorkRequestEnabled()) {
+            throw new BusinessException("휴가신청 기능이 비활성화되어 있습니다.");
+        }
     }
 
     private boolean isWorkplaceScopedAdmin(Employee admin) {

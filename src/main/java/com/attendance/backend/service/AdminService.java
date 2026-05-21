@@ -392,6 +392,7 @@ public class AdminService {
             setting.getMobileSkinKey(),
             setting.isEnforceSingleDeviceLogin(),
             setting.isWorkRequestApprovalRequired(),
+            setting.isWorkRequestEnabled(),
             "회사 위치가 수정되었습니다."
         );
     }
@@ -418,6 +419,7 @@ public class AdminService {
             setting.getMobileSkinKey(),
             setting.isEnforceSingleDeviceLogin(),
             setting.isWorkRequestApprovalRequired(),
+            setting.isWorkRequestEnabled(),
             "출근 반경이 수정되었습니다."
         );
     }
@@ -487,6 +489,7 @@ public class AdminService {
             normalizeMobileSkinKey(setting.getMobileSkinKey()),
             setting.isEnforceSingleDeviceLogin(),
             setting.isWorkRequestApprovalRequired(),
+            setting.isWorkRequestEnabled(),
             isWorkplaceScopedAdmin(admin),
             getAssignedWorkplaceId(admin),
             workplaces
@@ -562,6 +565,7 @@ public class AdminService {
         setting.updateMobileSkinKey(normalizeMobileSkinKey(request.getMobileSkinKey()));
         setting.updateEnforceSingleDeviceLogin(request.isEnforceSingleDeviceLogin());
         setting.updateWorkRequestApprovalRequired(request.isWorkRequestApprovalRequired());
+        setting.updateWorkRequestEnabled(request.isWorkRequestEnabled());
     }
 
     @Transactional

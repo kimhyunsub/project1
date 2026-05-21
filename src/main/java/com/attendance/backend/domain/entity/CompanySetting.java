@@ -42,6 +42,9 @@ public class CompanySetting extends BaseTimeEntity {
     @Column(name = "work_request_approval_required", nullable = false, columnDefinition = "boolean default true")
     private boolean workRequestApprovalRequired = true;
 
+    @Column(name = "work_request_enabled", nullable = false, columnDefinition = "boolean default true")
+    private boolean workRequestEnabled = true;
+
     protected CompanySetting() {
     }
 
@@ -83,6 +86,10 @@ public class CompanySetting extends BaseTimeEntity {
         return workRequestApprovalRequired;
     }
 
+    public boolean isWorkRequestEnabled() {
+        return workRequestEnabled;
+    }
+
     public void updateAllowedRadiusMeters(Integer allowedRadiusMeters) {
         this.allowedRadiusMeters = allowedRadiusMeters;
     }
@@ -105,5 +112,9 @@ public class CompanySetting extends BaseTimeEntity {
 
     public void updateWorkRequestApprovalRequired(boolean workRequestApprovalRequired) {
         this.workRequestApprovalRequired = workRequestApprovalRequired;
+    }
+
+    public void updateWorkRequestEnabled(boolean workRequestEnabled) {
+        this.workRequestEnabled = workRequestEnabled;
     }
 }

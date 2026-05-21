@@ -16,6 +16,7 @@ public class CompanySettingResponse {
     private final String mobileSkinKey;
     private final boolean enforceSingleDeviceLogin;
     private final boolean workRequestApprovalRequired;
+    private final boolean workRequestEnabled;
     private final String message;
 
     public CompanySettingResponse(
@@ -31,6 +32,7 @@ public class CompanySettingResponse {
         String mobileSkinKey,
         boolean enforceSingleDeviceLogin,
         boolean workRequestApprovalRequired,
+        boolean workRequestEnabled,
         String message
     ) {
         this.companyId = companyId;
@@ -45,6 +47,7 @@ public class CompanySettingResponse {
         this.mobileSkinKey = mobileSkinKey;
         this.enforceSingleDeviceLogin = enforceSingleDeviceLogin;
         this.workRequestApprovalRequired = workRequestApprovalRequired;
+        this.workRequestEnabled = workRequestEnabled;
         this.message = message;
     }
 
@@ -94,6 +97,10 @@ public class CompanySettingResponse {
 
     public boolean isWorkRequestApprovalRequired() {
         return workRequestApprovalRequired;
+    }
+
+    public boolean isWorkRequestEnabled() {
+        return workRequestEnabled;
     }
 
     public String getMessage() {

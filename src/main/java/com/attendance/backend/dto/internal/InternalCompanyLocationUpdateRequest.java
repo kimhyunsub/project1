@@ -10,6 +10,7 @@ public class InternalCompanyLocationUpdateRequest {
     private String mobileSkinKey;
     private boolean enforceSingleDeviceLogin;
     private boolean workRequestApprovalRequired;
+    private boolean workRequestEnabled = true;
 
     public String getCompanyName() {
         return companyName;
@@ -73,5 +74,13 @@ public class InternalCompanyLocationUpdateRequest {
 
     public void setWorkRequestApprovalRequired(boolean workRequestApprovalRequired) {
         this.workRequestApprovalRequired = workRequestApprovalRequired;
+    }
+
+    public boolean isWorkRequestEnabled() {
+        return workRequestEnabled;
+    }
+
+    public void setWorkRequestEnabled(boolean workRequestEnabled) {
+        this.workRequestEnabled = workRequestEnabled;
     }
 }

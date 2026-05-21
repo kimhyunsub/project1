@@ -13,6 +13,7 @@ public record InternalLocationSettingsResponse(
     String mobileSkinKey,
     boolean enforceSingleDeviceLogin,
     boolean workRequestApprovalRequired,
+    boolean workRequestEnabled,
     boolean workplaceScopedAdmin,
     Long assignedWorkplaceId,
     List<InternalWorkplaceLocationResponse> workplaces

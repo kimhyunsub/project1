@@ -92,7 +92,7 @@ public class AttendanceController {
             return ResponseEntity.ok(workRequestService.getRequests(employeeId));
         } catch (RuntimeException exception) {
             log.warn("Failed to get work requests. employeeId={}", employeeId, exception);
-            return ResponseEntity.ok(new WorkRequestListResponse(true, List.of()));
+            return ResponseEntity.ok(new WorkRequestListResponse(true, true, List.of()));
         }
     }
 

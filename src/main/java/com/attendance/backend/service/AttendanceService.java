@@ -202,6 +202,7 @@ public class AttendanceService {
             setting.getMobileSkinKey(),
             setting.isEnforceSingleDeviceLogin(),
             workplace == null ? setting.isWorkRequestApprovalRequired() : workplace.isWorkRequestApprovalRequired(),
+            setting.isWorkRequestEnabled(),
             "회사 설정 조회가 완료되었습니다."
         );
     }
@@ -225,6 +226,7 @@ public class AttendanceService {
             setting.getMobileSkinKey(),
             setting.isEnforceSingleDeviceLogin(),
             setting.isWorkRequestApprovalRequired(),
+            setting.isWorkRequestEnabled(),
             "회사 설정 조회가 완료되었습니다."
         );
     }
